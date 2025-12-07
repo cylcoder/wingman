@@ -13,28 +13,30 @@ public class FileService {
   @Value("${file.dir}")
   private String fileDir;
 
-  public String upload(MultipartFile file) throws IOException {
-    if (file == null || file.isEmpty()) {
-      throw new IllegalStateException();
+  public String upload(MultipartFile file) {
+    try {
+      if (file == null || file.isEmpty()) {
+        throw new IllegalStateException();
+      }
+
+      File directory = new File(fileDir);
+
+      if (!directory.exists()) {
+        directory.mkdirs();
+      }
+
+      String originalFilename = file.getOriginalFilename();
+      if (originalFilename == null) {
+        throw new IllegalStateException();
+      }
+
+      String ext = extractExt(originalFilename);
+      String storeFilename = UUID.randomUUID() + "." + ext;
+      file.transferTo(new File(fileDir + storeFilename));
+      return "/file/" + storeFilename;
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
     }
-
-    File directory = new File(fileDir);
-
-    if (!directory.exists()) {
-      directory.mkdirs();
-    }
-
-    String originalFilename = file.getOriginalFilename();
-    if (originalFilename == null) {
-      throw new IllegalStateException();
-    }
-
-    String ext = extractExt(originalFilename);
-    String storeFilename = UUID.randomUUID().toString() + "." + ext;
-
-    file.transferTo(new File(fileDir + storeFilename));
-
-    return "/files/" + storeFilename;
   }
 
   private String extractExt(String originalFilename) {
