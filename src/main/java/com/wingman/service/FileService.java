@@ -2,6 +2,9 @@ package com.wingman.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,7 +38,24 @@ public class FileService {
       file.transferTo(new File(fileDir + storeFilename));
       return "/file/" + storeFilename;
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException();
+    }
+  }
+
+  public void delete(String url) {
+    if (url == null || !url.startsWith("/file/")) {
+      throw new IllegalStateException();
+    }
+
+    String storeFilename = url.substring("/file/".length());
+    Path filePath = Paths.get(fileDir + storeFilename);
+
+    if (Files.exists(filePath)) {
+      try {
+        Files.delete(filePath);
+      } catch (IOException e) {
+        throw new IllegalStateException();
+      }
     }
   }
 

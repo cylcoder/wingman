@@ -40,4 +40,15 @@ public class UserService {
     userRepository.save(user);
   }
 
+  @Transactional
+  public void deleteById(Long id) {
+    User user = userRepository.findById(id).orElseThrow();
+
+    if (user.getProfileImageUrl() != null) {
+      fileService.delete(user.getProfileImageUrl());
+    }
+
+    userRepository.deleteById(id);
+  }
+
 }
