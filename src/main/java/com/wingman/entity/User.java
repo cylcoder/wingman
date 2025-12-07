@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,8 +41,17 @@ public class User extends BaseEntity {
   @Column(unique = true, nullable = false)
   private String phoneNumber;
 
+  @Column(nullable = false)
+  private String name;
+
   @Enumerated(EnumType.STRING)
   private Gender gender;
+
+  private LocalDate birthDate;
+
+  private String job;
+
+  private String region;
 
   private String profileImageUrl;
 
