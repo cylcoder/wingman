@@ -2,7 +2,6 @@ package com.wingman.dto;
 
 import com.wingman.entity.Gender;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
