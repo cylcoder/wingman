@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Discover</title>
+  <style>
+    #profile-card {
+      width: 350px;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+      margin: 20px auto;
+    }
+
+    img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+
+    .btn-group {
+      width: 350px;
+      margin: 15px auto;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      width: 48%;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .row {
+      margin: 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="profile-card">Loading...</div>
+
+<div class="btn-group">
+  <button id="dislike-btn">싫어요</button>
+  <button id="like-btn">좋아요</button>
+</div>
+
+<script>
+  let candidates = [];
+  let index = 0;
+
+  async function loadCandidates() {
+    const res = await fetch('/api/users/discover', {
+      credentials: "include"
+    });
+    candidates = await res.json();
+    index = 0;
+
+    if (candidates.length === 0) {
+      document.getElementById("profile-card").innerHTML =
+          "<p>추천할 사람이 없습니다.</p>";
+      disableButtons();
+      return;
+    }
+
+    render();
+  }
+
+  function render() {
+    const user = candidates[index];
+
+    const profileImageHtml = user.profileImageUrl
+        ? `<img src="${user.profileImageUrl}" alt="profile">`
+        : `<div style="width:180px;height:180px;border-radius:50%;background:#eee;
+                       display:flex;align-items:center;justify-content:center;
+                       margin:0 auto 15px;">
+             No Image
+           </div>`;
+
+    document.getElementById("profile-card").innerHTML = `
+        <h2>${user.name || ''}</h2>
+        ${profileImageHtml}
+
+        <div class="row"><span class="label">전화번호: </span>${user.phoneNumber || ''}</div>
+        <div class="row"><span class="label">생년월일: </span>${user.birthDate || ''}</div>
+        <div class="row"><span class="label">직업: </span>${user.job || ''}</div>
+        <div class="row"><span class="label">지역: </span>${user.region || ''}</div>
+    `;
+  }
+
+  function nextUser() {
+    if (index >= candidates.length - 1) {
+      alert("마지막 사람입니다!");
+      disableButtons();
+      return;
+    }
+
+    index++;
+    render();
+  }
+
+  function disableButtons() {
+    document.getElementById("like-btn").disabled = true;
+    document.getElementById("dislike-btn").disabled = true;
+  }
+
+  document.getElementById("like-btn").onclick = () => nextUser();
+  document.getElementById("dislike-btn").onclick = () => nextUser();
+
+  loadCandidates();
+</script>
+
+</body>
+</html>

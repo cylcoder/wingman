@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   public static final String BEARER_PREFIX = "Bearer ";*/
 
   private final JwtTokenProvider provider;
-
+  private final UserAuthenticationService userAuthenticationService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -31,8 +32,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     if (StringUtils.hasText(jwt) && provider.validateToken(jwt)) {
       String username = provider.getUsernameFromToken(jwt);
+      /*Collection<? extends GrantedAuthority> authorities =
+          Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));*/
+      UserDetails userDetails = userAuthenticationService.loadUserByUsername(username);
+
       Authentication authentication = new UsernamePasswordAuthenticationToken(
-          username, null, null);
+          userDetails,
+          null,
+          userDetails.getAuthorities()
+      );
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
